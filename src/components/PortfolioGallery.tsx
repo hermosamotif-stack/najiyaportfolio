@@ -118,7 +118,7 @@ const ProjectModal = ({ project, onClose }: { project: Project; onClose: () => v
 
       {/* Content */}
       <motion.div
-        className="relative z-10 w-full max-w-5xl mx-4 md:mx-8 max-h-[90vh] overflow-y-auto rounded-2xl glass-strong"
+        className="relative z-10 w-full max-w-5xl mx-4 md:mx-8 max-h-[90vh] overflow-y-auto scrollbar-none rounded-2xl glass-strong"
         initial={{ scale: 0.85, y: 60, opacity: 0 }}
         animate={{ scale: 1, y: 0, opacity: 1 }}
         exit={{ scale: 0.9, y: 40, opacity: 0 }}
