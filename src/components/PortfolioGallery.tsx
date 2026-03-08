@@ -46,11 +46,38 @@ const TiltCard = ({ project, height }: { project: Project; height: string }) => 
             loading="lazy"
           />
         )}
-        <div className="absolute inset-0 bg-background/80 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-all duration-500 flex flex-col items-center justify-center p-6 text-center">
-          <span className="text-xs tracking-[0.2em] uppercase text-accent mb-3">{project.category}</span>
-          <h3 className="text-xl font-display font-semibold">{project.title}</h3>
-          <p className="text-sm text-muted-foreground mt-2 max-w-xs">{project.description}</p>
-        </div>
+        <motion.div
+          className="absolute inset-0 bg-background/80 backdrop-blur-sm flex flex-col items-center justify-center p-6 text-center"
+          initial={false}
+          whileHover={{ opacity: 1 }}
+          animate={{ opacity: 0 }}
+          transition={{ duration: 0.35 }}
+        >
+          <motion.span
+            initial={{ y: 10, opacity: 0 }}
+            whileHover={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.05 }}
+            className="text-xs tracking-[0.2em] uppercase text-accent mb-3"
+          >
+            {project.category}
+          </motion.span>
+          <motion.h3
+            initial={{ y: 10, opacity: 0 }}
+            whileHover={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.1 }}
+            className="text-xl font-display font-semibold"
+          >
+            {project.title}
+          </motion.h3>
+          <motion.p
+            initial={{ y: 10, opacity: 0 }}
+            whileHover={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.15 }}
+            className="text-sm text-muted-foreground mt-2 max-w-xs"
+          >
+            {project.description}
+          </motion.p>
+        </motion.div>
       </div>
     </motion.div>
   );
@@ -81,18 +108,34 @@ const PortfolioGallery = () => {
           transition={{ duration: 0.6 }}
           className="mb-16"
         >
-          <p className="text-muted-foreground text-sm tracking-[0.3em] uppercase mb-3">Selected Work</p>
-          <h2 className="text-4xl md:text-5xl font-display font-bold">Portfolio</h2>
+          <motion.p
+            initial={{ opacity: 0, x: -20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="text-muted-foreground text-sm tracking-[0.3em] uppercase mb-3"
+          >
+            Selected Work
+          </motion.p>
+          <motion.h2
+            initial={{ opacity: 0, y: 20, filter: "blur(8px)" }}
+            whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="text-4xl md:text-5xl font-display font-bold"
+          >
+            Portfolio
+          </motion.h2>
         </motion.div>
 
         <div className="columns-1 sm:columns-2 lg:columns-3 gap-5 space-y-5">
           {projects.map((project, i) => (
             <motion.div
               key={project.id}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: i * 0.1 }}
+              initial={{ opacity: 0, y: 40, scale: 0.95 }}
+              whileInView={{ opacity: 1, y: 0, scale: 1 }}
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{ duration: 0.6, delay: i * 0.1, type: "spring", stiffness: 100 }}
             >
               <TiltCard project={project} height={heights[i % heights.length]} />
             </motion.div>
