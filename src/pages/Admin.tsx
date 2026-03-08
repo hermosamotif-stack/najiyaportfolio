@@ -73,7 +73,16 @@ const Admin = () => {
   return (
     <div className="min-h-screen flex" style={{ background: "#001247", color: "#DDDDDD" }}>
       <AdminSidebar activeTab={activeTab} setActiveTab={setActiveTab} onLogout={handleLogout} />
-      <main className="flex-1 p-6 md:p-10 overflow-y-auto min-h-screen">
+      {/* Mobile header */}
+      <div className="md:hidden fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 py-3" style={{ background: "#000e38", borderBottom: "1px solid #DDDDDD22" }}>
+        <span className="text-xs font-bold tracking-widest uppercase">STUDIO.</span>
+        <div className="flex gap-4 text-xs">
+          <button onClick={() => setActiveTab("dashboard")} style={{ opacity: activeTab === "dashboard" ? 1 : 0.5 }}>Dashboard</button>
+          <button onClick={() => setActiveTab("upload")} style={{ opacity: activeTab === "upload" ? 1 : 0.5 }}>Upload</button>
+          <button onClick={handleLogout} style={{ opacity: 0.5 }}>Logout</button>
+        </div>
+      </div>
+      <main className="flex-1 p-6 md:p-10 overflow-y-auto min-h-screen pt-16 md:pt-10">
         {activeTab === "dashboard" && (
           <AdminDashboard projects={projects} onDelete={async (id) => {
             const { error } = await supabase.from("projects").delete().eq("id", id);
