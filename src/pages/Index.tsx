@@ -1,12 +1,27 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import Navbar from "@/components/Navbar";
+import HeroSection from "@/components/HeroSection";
+import PortfolioGallery from "@/components/PortfolioGallery";
+import AboutSection from "@/components/AboutSection";
 
 const Index = () => {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
+    <div className="min-h-screen bg-background">
+      <Navbar />
+      <HeroSection />
+      <PortfolioGallery />
+      <AboutSection />
+
+      {/* Footer */}
+      <footer className="py-12 px-6 border-t border-border/50">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+          <span className="font-display font-bold text-lg">
+            STUDIO<span className="text-accent">.</span>
+          </span>
+          <p className="text-sm text-muted-foreground">
+            © {new Date().getFullYear()} All rights reserved.
+          </p>
+        </div>
+      </footer>
     </div>
   );
 };
