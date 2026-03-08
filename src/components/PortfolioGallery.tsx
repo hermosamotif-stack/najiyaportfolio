@@ -14,9 +14,8 @@ const TiltCard = ({ project, height }: { project: Project; height: string }) => 
   const ref = useRef<HTMLDivElement>(null);
   const x = useMotionValue(0);
   const y = useMotionValue(0);
-  const rotateX = useSpring(useTransform(y, [-0.5, 0.5], [6, -6]), { stiffness: 200, damping: 20 });
-  const rotateY = useSpring(useTransform(x, [-0.5, 0.5], [-6, 6]), { stiffness: 200, damping: 20 });
-  const brightness = useTransform(x, [-0.5, 0, 0.5], [0.95, 1, 1.05]);
+  const rotateX = useSpring(useTransform(y, [-0.5, 0.5], [8, -8]), { stiffness: 200, damping: 20 });
+  const rotateY = useSpring(useTransform(x, [-0.5, 0.5], [-8, 8]), { stiffness: 200, damping: 20 });
 
   const handleMouse = (e: React.MouseEvent) => {
     if (!ref.current) return;
@@ -25,15 +24,18 @@ const TiltCard = ({ project, height }: { project: Project; height: string }) => 
     y.set((e.clientY - rect.top) / rect.height - 0.5);
   };
 
-  const handleLeave = () => { x.set(0); y.set(0); };
+  const handleLeave = () => {
+    x.set(0);
+    y.set(0);
+  };
 
   return (
     <motion.div
       ref={ref}
       onMouseMove={handleMouse}
       onMouseLeave={handleLeave}
-      style={{ rotateX, rotateY, transformPerspective: 800, filter: useTransform(brightness, v => `brightness(${v})`) }}
-      className="break-inside-avoid group will-change-transform"
+      style={{ rotateX, rotateY, transformPerspective: 800 }}
+      className="break-inside-avoid group"
     >
       <div className={`relative ${height} rounded-xl overflow-hidden glass cursor-pointer`}>
         {project.image_url && (
@@ -70,7 +72,7 @@ const PortfolioGallery = () => {
   const heights = ["h-64", "h-80", "h-72", "h-96", "h-64", "h-80"];
 
   return (
-    <section id="portfolio" className="py-24 px-6 relative z-10">
+    <section id="portfolio" className="py-24 px-6">
       <div className="max-w-7xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -90,7 +92,7 @@ const PortfolioGallery = () => {
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: i * 0.08 }}
+              transition={{ duration: 0.5, delay: i * 0.1 }}
             >
               <TiltCard project={project} height={heights[i % heights.length]} />
             </motion.div>

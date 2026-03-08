@@ -2,14 +2,14 @@ import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
 import PortfolioGallery from "@/components/PortfolioGallery";
 import AboutSection from "@/components/AboutSection";
-import CursorTrail from "@/components/CursorTrail";
-import MorphingBlobs from "@/components/MorphingBlobs";
+import CustomCursor from "@/components/CustomCursor";
+import ParallaxBackground from "@/components/ParallaxBackground";
 
 const Index = () => {
   return (
     <div className="min-h-screen bg-background">
-      <CursorTrail />
-      <MorphingBlobs />
+      <CustomCursor />
+      <ParallaxBackground />
       <Navbar />
       <HeroSection />
       <PortfolioGallery />
