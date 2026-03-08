@@ -4,9 +4,6 @@ export interface Project {
   description: string;
   imageUrl: string;
   category: string;
-  clientName?: string;
-  status: "published" | "draft" | "hidden";
-  views: number;
   createdAt: string;
 }
 
@@ -19,9 +16,6 @@ const defaultProjects: Project[] = [
     description: "Complete brand identity system for a tech startup",
     imageUrl: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=600&h=400&fit=crop",
     category: "Branding",
-    clientName: "Nebula Corp",
-    status: "published",
-    views: 342,
     createdAt: new Date().toISOString(),
   },
   {
@@ -30,9 +24,6 @@ const defaultProjects: Project[] = [
     description: "Modern UI component library with dark theme",
     imageUrl: "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=600&h=500&fit=crop",
     category: "UI/UX",
-    clientName: "QuantumLabs",
-    status: "published",
-    views: 218,
     createdAt: new Date().toISOString(),
   },
   {
@@ -40,10 +31,7 @@ const defaultProjects: Project[] = [
     title: "Aurora Packaging",
     description: "Premium packaging design for luxury skincare",
     imageUrl: "https://images.unsplash.com/photo-1561070791-2526d30994b5?w=600&h=350&fit=crop",
-    category: "Branding",
-    clientName: "Aurora Beauty",
-    status: "published",
-    views: 156,
+    category: "Packaging",
     createdAt: new Date().toISOString(),
   },
   {
@@ -51,10 +39,7 @@ const defaultProjects: Project[] = [
     title: "Cipher Magazine",
     description: "Editorial layout for a digital culture magazine",
     imageUrl: "https://images.unsplash.com/photo-1634986666676-ec8fd927c23d?w=600&h=450&fit=crop",
-    category: "Multimedia",
-    clientName: "Cipher Media",
-    status: "draft",
-    views: 0,
+    category: "Editorial",
     createdAt: new Date().toISOString(),
   },
   {
@@ -62,10 +47,7 @@ const defaultProjects: Project[] = [
     title: "Vertex Motion Graphics",
     description: "Animated brand intro for a gaming company",
     imageUrl: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=600&h=400&fit=crop",
-    category: "Multimedia",
-    clientName: "Vertex Games",
-    status: "published",
-    views: 489,
+    category: "Motion",
     createdAt: new Date().toISOString(),
   },
   {
@@ -73,10 +55,7 @@ const defaultProjects: Project[] = [
     title: "Prism Web Experience",
     description: "Immersive web design for an art exhibition",
     imageUrl: "https://images.unsplash.com/photo-1633356122102-3fe601e05bd2?w=600&h=500&fit=crop",
-    category: "Social Media",
-    clientName: "Prism Gallery",
-    status: "published",
-    views: 274,
+    category: "Web Design",
     createdAt: new Date().toISOString(),
   },
 ];
@@ -90,24 +69,16 @@ export function getProjects(): Project[] {
   return JSON.parse(stored);
 }
 
-export function addProject(project: Omit<Project, "id" | "createdAt" | "views">): Project {
+export function addProject(project: Omit<Project, "id" | "createdAt">): Project {
   const projects = getProjects();
   const newProject: Project = {
     ...project,
     id: crypto.randomUUID(),
-    views: 0,
     createdAt: new Date().toISOString(),
   };
   projects.unshift(newProject);
   localStorage.setItem(STORAGE_KEY, JSON.stringify(projects));
   return newProject;
-}
-
-export function updateProject(id: string, updates: Partial<Project>): void {
-  const projects = getProjects().map((p) =>
-    p.id === id ? { ...p, ...updates } : p
-  );
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(projects));
 }
 
 export function deleteProject(id: string): void {

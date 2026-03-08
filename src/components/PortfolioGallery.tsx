@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { getProjects } from "@/lib/projects";
 
 const PortfolioGallery = () => {
-  const projects = getProjects().filter(p => p.status !== "hidden");
+  const projects = getProjects();
 
   // Masonry-like heights
   const heights = ["h-64", "h-80", "h-72", "h-96", "h-64", "h-80"];
