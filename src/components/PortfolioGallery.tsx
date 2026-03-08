@@ -1,10 +1,28 @@
 import { motion } from "framer-motion";
-import { getProjects } from "@/lib/projects";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+
+type Project = {
+  id: string;
+  title: string;
+  description: string | null;
+  category: string;
+  image_url: string | null;
+};
 
 const PortfolioGallery = () => {
-  const projects = getProjects();
+  const [projects, setProjects] = useState<Project[]>([]);
 
-  // Masonry-like heights
+  useEffect(() => {
+    supabase
+      .from("projects")
+      .select("id, title, description, category, image_url")
+      .order("created_at", { ascending: false })
+      .then(({ data }) => {
+        if (data) setProjects(data);
+      });
+  }, []);
+
   const heights = ["h-64", "h-80", "h-72", "h-96", "h-64", "h-80"];
 
   return (
@@ -32,13 +50,14 @@ const PortfolioGallery = () => {
               className="break-inside-avoid group"
             >
               <div className={`relative ${heights[i % heights.length]} rounded-xl overflow-hidden glass cursor-pointer`}>
-                <img
-                  src={project.imageUrl}
-                  alt={project.title}
-                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                  loading="lazy"
-                />
-                {/* Hover overlay */}
+                {project.image_url && (
+                  <img
+                    src={project.image_url}
+                    alt={project.title}
+                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    loading="lazy"
+                  />
+                )}
                 <div className="absolute inset-0 bg-background/80 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-all duration-500 flex flex-col items-center justify-center p-6 text-center">
                   <span className="text-xs tracking-[0.2em] uppercase text-accent mb-3">{project.category}</span>
                   <h3 className="text-xl font-display font-semibold">{project.title}</h3>
