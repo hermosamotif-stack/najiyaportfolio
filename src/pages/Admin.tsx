@@ -1,15 +1,15 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
-import {
-  ArrowLeft, Plus, Trash2, Lock, Eye, EyeOff,
-  LogOut, FolderOpen, Tag, X, Check
-} from "lucide-react";
+import { Lock, Eye, EyeOff } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { getProjects, addProject, deleteProject, type Project } from "@/lib/projects";
+import { getProjects, type Project } from "@/lib/projects";
 import { toast } from "sonner";
+import AdminSidebar from "@/components/admin/AdminSidebar";
+import StatsCards from "@/components/admin/StatsCards";
+import UploadPanel from "@/components/admin/UploadPanel";
+import ProjectFeed from "@/components/admin/ProjectFeed";
 
 const ADMIN_PASSWORD = "studio2024";
 
@@ -20,34 +20,21 @@ const Admin = () => {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [projects, setProjects] = useState<Project[]>(getProjects());
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [imageUrl, setImageUrl] = useState("");
-  const [category, setCategory] = useState("");
-  const [showForm, setShowForm] = useState(false);
-  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState("overview");
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!title || !imageUrl || !category) {
-      toast.error("Please fill in all required fields.");
-      return;
+    if (password === ADMIN_PASSWORD) {
+      setIsAuthenticated(true);
+      sessionStorage.setItem("admin_auth", "true");
+      toast.success("Access granted. Welcome back.", {
+        description: "Your command center is ready.",
+      });
+    } else {
+      toast.error("Incorrect password.");
     }
-    addProject({ title, description, imageUrl, category });
-    setProjects(getProjects());
-    setTitle("");
-    setDescription("");
-    setImageUrl("");
-    setCategory("");
-    setShowForm(false);
-    toast.success("Project added!");
-  };
-
-  const handleDelete = (id: string) => {
-    deleteProject(id);
-    setProjects(getProjects());
-    setDeleteConfirm(null);
-    toast.success("Project deleted.");
+    setPassword("");
   };
 
   const handleLogout = () => {
@@ -55,42 +42,35 @@ const Admin = () => {
     setIsAuthenticated(false);
   };
 
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (password === ADMIN_PASSWORD) {
-      setIsAuthenticated(true);
-      sessionStorage.setItem("admin_auth", "true");
-      toast.success("Access granted.");
-    } else {
-      toast.error("Incorrect password.");
-    }
-    setPassword("");
-  };
-
-  const categories = [...new Set(projects.map((p) => p.category))];
-
+  // Login screen
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-6">
+      <div className="min-h-screen bg-background flex items-center justify-center p-6 relative overflow-hidden">
+        {/* Ambient background */}
+        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-accent/5 blur-[120px] pointer-events-none" />
+
         <motion.form
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.4 }}
+          initial={{ opacity: 0, scale: 0.95, y: 20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
           onSubmit={handleLogin}
-          className="glass glow-box rounded-2xl p-10 w-full max-w-md space-y-6 text-center"
+          className="glass glow-box rounded-2xl p-10 w-full max-w-md space-y-6 text-center relative z-10"
         >
-          <div className="mx-auto w-14 h-14 rounded-full bg-accent/10 flex items-center justify-center mb-2">
-            <Lock className="w-6 h-6 text-accent" />
+          <div className="mx-auto w-16 h-16 rounded-2xl glass flex items-center justify-center mb-2 glow-border">
+            <Lock className="w-7 h-7 text-accent" />
           </div>
-          <h1 className="text-2xl font-display font-bold">Admin Access</h1>
-          <p className="text-sm text-muted-foreground">Enter your password to continue</p>
+          <div>
+            <h1 className="text-2xl font-display font-bold">Command Center</h1>
+            <p className="text-sm text-muted-foreground mt-2">Authenticate to access your dashboard</p>
+          </div>
+
           <div className="relative">
             <Input
               type={showPassword ? "text" : "password"}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Password"
-              className="bg-input/50 border-border pr-10"
+              placeholder="Enter password"
+              className="bg-input/50 border-border pr-10 h-11"
               autoFocus
             />
             <button
@@ -101,11 +81,13 @@ const Admin = () => {
               {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
             </button>
           </div>
-          <Button type="submit" className="w-full bg-accent text-accent-foreground hover:bg-accent/80">
-            Unlock
+
+          <Button type="submit" className="w-full bg-accent text-accent-foreground hover:bg-accent/80 h-11 font-medium">
+            Unlock Dashboard
           </Button>
-          <Link to="/" className="text-xs text-muted-foreground hover:text-foreground transition-colors inline-block mt-2">
-            ← Back to portfolio
+
+          <Link to="/" className="text-xs text-muted-foreground hover:text-foreground transition-colors inline-block">
+            ← Return to portfolio
           </Link>
         </motion.form>
       </div>
@@ -113,198 +95,105 @@ const Admin = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Top bar */}
-      <header className="sticky top-0 z-40 glass-strong border-b border-border/30">
-        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Link to="/" className="text-muted-foreground hover:text-foreground transition-colors">
-              <ArrowLeft className="w-5 h-5" />
-            </Link>
-            <div>
-              <h1 className="text-lg font-display font-bold leading-tight">
-                STUDIO<span className="text-accent">.</span> Admin
-              </h1>
-            </div>
-          </div>
-          <button
-            onClick={handleLogout}
-            className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
-          >
-            <LogOut className="w-4 h-4" />
-            <span className="hidden sm:inline">Sign out</span>
-          </button>
-        </div>
-      </header>
+    <div className="min-h-screen bg-background flex">
+      <AdminSidebar
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        onLogout={handleLogout}
+        collapsed={sidebarCollapsed}
+        onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+      />
 
-      <div className="max-w-6xl mx-auto px-6 py-10">
-        {/* Stats row */}
-        <motion.div
-          initial={{ opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-10"
-        >
-          <div className="glass rounded-xl px-5 py-4 flex items-center gap-4">
-            <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center">
-              <FolderOpen className="w-5 h-5 text-accent" />
-            </div>
-            <div>
-              <p className="text-2xl font-display font-bold">{projects.length}</p>
-              <p className="text-xs text-muted-foreground">Projects</p>
-            </div>
-          </div>
-          <div className="glass rounded-xl px-5 py-4 flex items-center gap-4">
-            <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center">
-              <Tag className="w-5 h-5 text-accent" />
-            </div>
-            <div>
-              <p className="text-2xl font-display font-bold">{categories.length}</p>
-              <p className="text-xs text-muted-foreground">Categories</p>
-            </div>
-          </div>
-          <div className="hidden md:flex glass rounded-xl px-5 py-4 items-center gap-4">
-            <div className="w-10 h-10 rounded-lg bg-green-500/10 flex items-center justify-center">
-              <div className="w-2.5 h-2.5 rounded-full bg-green-400 animate-pulse" />
-            </div>
-            <div>
-              <p className="text-sm font-display font-semibold">Portfolio Live</p>
-              <p className="text-xs text-muted-foreground">All systems online</p>
-            </div>
-          </div>
-        </motion.div>
-
-        {/* Action bar */}
-        <motion.div
-          initial={{ opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="flex items-center justify-between mb-6"
-        >
-          <h2 className="text-xl font-display font-semibold">Projects</h2>
-          <Button
-            onClick={() => setShowForm(!showForm)}
-            className={showForm ? "bg-secondary text-secondary-foreground hover:bg-secondary/80" : "bg-accent text-accent-foreground hover:bg-accent/80"}
-          >
-            {showForm ? <X className="w-4 h-4 mr-2" /> : <Plus className="w-4 h-4 mr-2" />}
-            {showForm ? "Cancel" : "New Project"}
-          </Button>
-        </motion.div>
-
-        {/* Collapsible Form */}
-        <AnimatePresence>
-          {showForm && (
-            <motion.form
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.3 }}
-              onSubmit={handleSubmit}
-              className="glass rounded-xl p-6 mb-8 overflow-hidden"
-            >
-              <div className="grid md:grid-cols-2 gap-5 mb-5">
-                <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-muted-foreground">Title *</label>
-                  <Input
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    placeholder="Project name"
-                    className="bg-input/50 border-border"
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-muted-foreground">Category *</label>
-                  <Input
-                    value={category}
-                    onChange={(e) => setCategory(e.target.value)}
-                    placeholder="e.g. Branding"
-                    className="bg-input/50 border-border"
-                  />
-                </div>
-              </div>
-              <div className="space-y-1.5 mb-5">
-                <label className="text-xs font-medium text-muted-foreground">Image URL *</label>
-                <Input
-                  value={imageUrl}
-                  onChange={(e) => setImageUrl(e.target.value)}
-                  placeholder="https://..."
-                  className="bg-input/50 border-border"
-                />
-              </div>
-              {imageUrl && (
-                <div className="mb-5 rounded-lg overflow-hidden border border-border/30 max-w-xs">
-                  <img src={imageUrl} alt="Preview" className="w-full h-32 object-cover" />
-                </div>
-              )}
-              <div className="space-y-1.5 mb-6">
-                <label className="text-xs font-medium text-muted-foreground">Description</label>
-                <Textarea
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Optional description..."
-                  className="bg-input/50 border-border resize-none"
-                  rows={3}
-                />
-              </div>
-              <Button type="submit" className="bg-accent text-accent-foreground hover:bg-accent/80">
-                <Check className="w-4 h-4 mr-2" />
-                Save Project
-              </Button>
-            </motion.form>
-          )}
-        </AnimatePresence>
-
-        {/* Project cards */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.15 }}
-          className="space-y-3"
-        >
-          {projects.map((project, i) => (
-            <motion.div
-              key={project.id}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.02 * i }}
-              className="glass rounded-xl p-4 flex items-center gap-4 group hover:glow-box transition-all duration-300"
-            >
-              <img
-                src={project.imageUrl}
-                alt={project.title}
-                className="w-14 h-14 rounded-lg object-cover flex-shrink-0"
-              />
-              <div className="flex-1 min-w-0">
-                <h3 className="font-display font-semibold text-sm truncate">{project.title}</h3>
-                <p className="text-xs text-muted-foreground truncate">{project.description || "No description"}</p>
-              </div>
-              <span className="hidden sm:inline-block text-[10px] uppercase tracking-wider bg-secondary/60 px-3 py-1 rounded-full text-muted-foreground flex-shrink-0">
-                {project.category}
-              </span>
-              {deleteConfirm === project.id ? (
-                <div className="flex items-center gap-2 flex-shrink-0">
-                  <button onClick={() => handleDelete(project.id)} className="text-xs text-destructive font-medium hover:underline">Delete</button>
-                  <button onClick={() => setDeleteConfirm(null)} className="text-xs text-muted-foreground hover:underline">Cancel</button>
-                </div>
-              ) : (
-                <button
-                  onClick={() => setDeleteConfirm(project.id)}
-                  className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive transition-all flex-shrink-0"
+      {/* Main content */}
+      <main className="flex-1 min-w-0 pt-14 lg:pt-0">
+        <div className="p-5 md:p-8 max-w-6xl mx-auto">
+          <AnimatePresence mode="wait">
+            {activeTab === "overview" && (
+              <motion.div
+                key="overview"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="space-y-8"
+              >
+                {/* Header */}
+                <motion.div
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
                 >
-                  <Trash2 className="w-4 h-4" />
-                </button>
-              )}
-            </motion.div>
-          ))}
+                  <h1 className="text-3xl font-display font-bold">
+                    Welcome back<span className="text-accent">.</span>
+                  </h1>
+                  <p className="text-muted-foreground text-sm mt-1">
+                    Here's what's happening with your portfolio
+                  </p>
+                </motion.div>
 
-          {projects.length === 0 && (
-            <div className="glass rounded-xl p-16 text-center">
-              <FolderOpen className="w-10 h-10 mx-auto mb-4 text-muted-foreground/30" />
-              <p className="font-display font-medium text-muted-foreground">No projects yet</p>
-              <p className="text-sm text-muted-foreground/60 mt-1">Click "New Project" to add your first one.</p>
-            </div>
-          )}
-        </motion.div>
-      </div>
+                {/* Stats */}
+                <StatsCards projects={projects} />
+
+                {/* Recent activity */}
+                <motion.div
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
+                >
+                  <h3 className="text-lg font-display font-semibold mb-4">Recent Work</h3>
+                  <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {projects.slice(0, 3).map((project, i) => (
+                      <motion.div
+                        key={project.id}
+                        initial={{ opacity: 0, y: 15 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.35 + i * 0.08 }}
+                        className="glass rounded-xl overflow-hidden group hover:glow-border transition-all duration-300"
+                      >
+                        <div className="relative h-32 overflow-hidden">
+                          <img
+                            src={project.imageUrl}
+                            alt={project.title}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
+                          <div className="absolute bottom-3 left-3 right-3">
+                            <h4 className="font-display font-semibold text-sm truncate">{project.title}</h4>
+                            <p className="text-[10px] text-muted-foreground uppercase tracking-wider mt-0.5">{project.category}</p>
+                          </div>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                </motion.div>
+              </motion.div>
+            )}
+
+            {activeTab === "upload" && (
+              <motion.div
+                key="upload"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                <UploadPanel onProjectAdded={setProjects} />
+              </motion.div>
+            )}
+
+            {activeTab === "projects" && (
+              <motion.div
+                key="projects"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                <ProjectFeed projects={projects} onProjectsChange={setProjects} />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      </main>
     </div>
   );
 };
