@@ -1,14 +1,21 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { ArrowLeft, Plus, Trash2 } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, Lock, Eye, EyeOff } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { getProjects, addProject, deleteProject, type Project } from "@/lib/projects";
 import { toast } from "sonner";
 
+const ADMIN_PASSWORD = "studio2024";
+
 const Admin = () => {
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    return sessionStorage.getItem("admin_auth") === "true";
+  });
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [projects, setProjects] = useState<Project[]>(getProjects());
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -35,6 +42,64 @@ const Admin = () => {
     setProjects(getProjects());
     toast.success("Project deleted.");
   };
+
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (password === ADMIN_PASSWORD) {
+      setIsAuthenticated(true);
+      sessionStorage.setItem("admin_auth", "true");
+      toast.success("Access granted.");
+    } else {
+      toast.error("Incorrect password.");
+    }
+    setPassword("");
+  };
+
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-6">
+        <motion.form
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.4 }}
+          onSubmit={handleLogin}
+          className="glass glow-box rounded-2xl p-10 w-full max-w-md space-y-6 text-center"
+        >
+          <div className="mx-auto w-14 h-14 rounded-full bg-accent/10 flex items-center justify-center mb-2">
+            <Lock className="w-6 h-6 text-accent" />
+          </div>
+          <h1 className="text-2xl font-display font-bold">Admin Access</h1>
+          <p className="text-sm text-muted-foreground">Enter your password to continue</p>
+
+          <div className="relative">
+            <Input
+              type={showPassword ? "text" : "password"}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Password"
+              className="bg-input/50 border-border pr-10"
+              autoFocus
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+            >
+              {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+            </button>
+          </div>
+
+          <Button type="submit" className="w-full bg-accent text-accent-foreground hover:bg-accent/80">
+            Unlock
+          </Button>
+
+          <Link to="/" className="text-xs text-muted-foreground hover:text-foreground transition-colors inline-block mt-2">
+            ← Back to portfolio
+          </Link>
+        </motion.form>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background p-6 md:p-12">
