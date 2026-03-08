@@ -1,14 +1,21 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { ArrowLeft, Plus, Trash2 } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, Lock, Eye, EyeOff } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { getProjects, addProject, deleteProject, type Project } from "@/lib/projects";
 import { toast } from "sonner";
 
+const ADMIN_PASSWORD = "studio2024";
+
 const Admin = () => {
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    return sessionStorage.getItem("admin_auth") === "true";
+  });
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [projects, setProjects] = useState<Project[]>(getProjects());
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
