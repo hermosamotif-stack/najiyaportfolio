@@ -78,9 +78,14 @@ const HeroSection = () => {
         <h1 className="text-5xl md:text-7xl lg:text-8xl font-display font-bold leading-tight glow-text">
           <AnimatedText text="Crafting Digital" />
           <br />
-          <span className="gradient-text">
-            <AnimatedText text="Experiences" />
-          </span>
+          <motion.span
+            className="gradient-text"
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.4, ease: [0.215, 0.61, 0.355, 1] }}
+          >
+            Experiences
+          </motion.span>
         </h1>
 
         <motion.p
