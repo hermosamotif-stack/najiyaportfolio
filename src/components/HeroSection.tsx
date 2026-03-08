@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { ArrowDown } from "lucide-react";
+import MagneticButton from "./MagneticButton";
 
 const HeroSection = () => {
   const scrollToWork = () => {
@@ -44,16 +45,22 @@ const HeroSection = () => {
           Branding · UI/UX · Motion · Editorial
         </motion.p>
 
-        <motion.button
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.8 }}
-          onClick={scrollToWork}
-          className="mt-12 glass glow-box px-8 py-4 rounded-full font-display font-medium tracking-wide text-foreground hover:bg-accent/20 transition-all duration-300 inline-flex items-center gap-3 group"
+          className="mt-12 inline-block"
         >
-          View Work
-          <ArrowDown className="w-4 h-4 group-hover:translate-y-1 transition-transform" />
-        </motion.button>
+          <MagneticButton>
+            <button
+              onClick={scrollToWork}
+              className="glass glow-box px-8 py-4 rounded-full font-display font-medium tracking-wide text-foreground hover:bg-accent/20 transition-all duration-300 inline-flex items-center gap-3 group"
+            >
+              View Work
+              <ArrowDown className="w-4 h-4 group-hover:translate-y-1 transition-transform" />
+            </button>
+          </MagneticButton>
+        </motion.div>
       </div>
 
       {/* Grid lines decoration */}
