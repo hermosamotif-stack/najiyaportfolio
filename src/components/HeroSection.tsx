@@ -2,6 +2,34 @@ import { motion } from "framer-motion";
 import { ArrowDown } from "lucide-react";
 import MagneticButton from "./MagneticButton";
 
+const letterVariants = {
+  hidden: { opacity: 0, y: 50, rotateX: -90 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    rotateX: 0,
+    transition: { duration: 0.6, delay: 0.3 + i * 0.04, ease: [0.215, 0.61, 0.355, 1] as const },
+  }),
+};
+
+const AnimatedText = ({ text, className }: { text: string; className?: string }) => (
+  <span className={className}>
+    {text.split("").map((char, i) => (
+      <motion.span
+        key={i}
+        custom={i}
+        variants={letterVariants}
+        initial="hidden"
+        animate="visible"
+        className="inline-block"
+        style={{ whiteSpace: char === " " ? "pre" : undefined }}
+      >
+        {char}
+      </motion.span>
+    ))}
+  </span>
+);
+
 const HeroSection = () => {
   const scrollToWork = () => {
     document.getElementById("portfolio")?.scrollIntoView({ behavior: "smooth" });
@@ -9,35 +37,56 @@ const HeroSection = () => {
 
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden px-6">
-      {/* Ambient glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-glow/10 blur-[120px] animate-pulse-glow pointer-events-none" />
-      <div className="absolute top-1/4 right-1/4 w-[300px] h-[300px] rounded-full bg-accent/5 blur-[80px] animate-float pointer-events-none" />
+      {/* Animated ambient glows */}
+      <motion.div
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-glow/10 blur-[120px] pointer-events-none"
+        animate={{
+          scale: [1, 1.2, 1],
+          opacity: [0.3, 0.6, 0.3],
+        }}
+        transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+      />
+      <motion.div
+        className="absolute top-1/4 right-1/4 w-[300px] h-[300px] rounded-full bg-accent/5 blur-[80px] pointer-events-none"
+        animate={{
+          x: [0, 30, -20, 0],
+          y: [0, -20, 15, 0],
+          scale: [1, 1.15, 0.95, 1],
+        }}
+        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+      />
+      <motion.div
+        className="absolute bottom-1/4 left-1/4 w-[250px] h-[250px] rounded-full bg-glow/5 blur-[100px] pointer-events-none"
+        animate={{
+          x: [0, -25, 15, 0],
+          y: [0, 20, -10, 0],
+          opacity: [0.2, 0.5, 0.2],
+        }}
+        transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
+      />
 
       <div className="relative z-10 text-center max-w-4xl mx-auto">
         <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
+          initial={{ opacity: 0, y: 20, filter: "blur(10px)" }}
+          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+          transition={{ duration: 0.8 }}
           className="text-muted-foreground text-sm tracking-[0.3em] uppercase mb-6"
         >
           Senior Graphic Designer
         </motion.p>
 
-        <motion.h1
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
-          className="text-5xl md:text-7xl lg:text-8xl font-display font-bold leading-tight glow-text"
-        >
-          Crafting Digital
+        <h1 className="text-5xl md:text-7xl lg:text-8xl font-display font-bold leading-tight glow-text">
+          <AnimatedText text="Crafting Digital" />
           <br />
-          <span className="gradient-text">Experiences</span>
-        </motion.h1>
+          <span className="gradient-text">
+            <AnimatedText text="Experiences" />
+          </span>
+        </h1>
 
         <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.5 }}
+          initial={{ opacity: 0, y: 20, filter: "blur(10px)" }}
+          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+          transition={{ duration: 0.8, delay: 1.2 }}
           className="mt-8 text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed"
         >
           Transforming bold ideas into stunning visual identities.
@@ -46,9 +95,9 @@ const HeroSection = () => {
         </motion.p>
 
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.8 }}
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.6, delay: 1.5, type: "spring", stiffness: 200 }}
           className="mt-12 inline-block"
         >
           <MagneticButton>
@@ -64,12 +113,17 @@ const HeroSection = () => {
       </div>
 
       {/* Grid lines decoration */}
-      <div className="absolute inset-0 pointer-events-none opacity-[0.03]">
+      <motion.div
+        className="absolute inset-0 pointer-events-none"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 0.03 }}
+        transition={{ duration: 2 }}
+      >
         <div className="h-full w-full" style={{
           backgroundImage: "linear-gradient(hsl(var(--foreground)) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--foreground)) 1px, transparent 1px)",
           backgroundSize: "80px 80px"
         }} />
-      </div>
+      </motion.div>
     </section>
   );
 };
