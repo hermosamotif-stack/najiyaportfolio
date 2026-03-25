@@ -57,9 +57,13 @@ const AboutSection = () => {
             <h2 className="text-4xl md:text-5xl font-display font-bold mb-8">
               <AnimatedWords text="5+ Years of" />
               <br />
-              <span className="gradient-text">
-                <AnimatedWords text="Creative Vision" />
-              </span>
+              <motion.span
+                className="text-accent"
+                variants={wordVariants}
+                custom={3}
+              >
+                Creative Vision
+              </motion.span>
             </h2>
             <div className="space-y-4 text-muted-foreground leading-relaxed">
               <motion.p
