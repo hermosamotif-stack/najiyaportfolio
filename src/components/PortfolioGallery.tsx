@@ -1,7 +1,15 @@
 import { motion, useMotionValue, useSpring, useTransform, AnimatePresence } from "framer-motion";
 import { useEffect, useState, useRef } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { X } from "lucide-react";
 
-// ... keep existing code (Project type)
+type Project = {
+  id: string;
+  title: string;
+  description: string | null;
+  category: string;
+  image_url: string | null;
+};
 
 const GalleryCard = ({ project, onClick }: { project: Project; onClick: () => void }) => {
   const ref = useRef<HTMLDivElement>(null);
