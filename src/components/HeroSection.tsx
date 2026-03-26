@@ -95,8 +95,6 @@ const HeroSection = () => {
           className="mt-8 text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed"
         >
           Transforming bold ideas into stunning visual identities.
-          <br className="hidden md:block" />
-          Branding · UI/UX · Motion · Editorial
         </motion.p>
 
         <motion.div
