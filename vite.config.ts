@@ -5,6 +5,7 @@ import { componentTagger } from "lovable-tagger";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
+  base: "./", // ഇതാണ് നിങ്ങൾ പുതുതായി ചേർക്കേണ്ട വരി
   server: {
     host: "::",
     port: 8080,
