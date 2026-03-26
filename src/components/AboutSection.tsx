@@ -72,9 +72,9 @@ const AboutSection = () => {
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: 0.4 }}
               >
-                I'm a Senior Graphic Designer specializing in branding, multimedia, and digital experiences.
-                With over five years in the industry, I've collaborated with startups, agencies, and global
-                brands to build visual identities that resonate.
+                Hello! I'm Najiya Chukkan, a passionate Graphic Designer dedicated to crafting bold, clean, and creative visual stories. With a strong focus on branding and visual identity, I strive to create designs that not only stand out but also build meaningful connections between brands and their audiences.
+                <br /><br />
+                Based in Vengara, Malappuram, I hold a degree in BA Multimedia from Malabar College of Advanced Studies. My professional journey includes hands-on experience in both agency environments and freelance projects, where I have specialized in logo design, social media creatives, and engaging visual content.
               </motion.p>
               <motion.p
                 initial={{ opacity: 0, y: 15, filter: "blur(6px)" }}
@@ -82,9 +82,8 @@ const AboutSection = () => {
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: 0.6 }}
               >
-                My approach blends minimalist aesthetics with bold experimentation — every pixel
-                serves a purpose, every animation tells a story. I believe great design is invisible
-                until it makes you feel something.
+                <span className="block font-bold text-foreground mb-2">What I Do</span>
+                I blend technical expertise with a creative eye to deliver high-quality design solutions: Branding & Identity (Developing unique logos and cohesive brand identities), Digital Content (Designing impactful social media posters and creatives), and Visual Media (Skilled in photography, as well as professional photo and video editing).
               </motion.p>
             </div>
           </motion.div>
