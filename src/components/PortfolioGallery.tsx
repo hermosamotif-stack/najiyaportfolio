@@ -1,5 +1,5 @@
-import { motion, AnimatePresence } from "framer-motion";
-import { useEffect, useState } from "react";
+import { motion, useMotionValue, useSpring, useTransform, AnimatePresence } from "framer-motion";
+import { useEffect, useState, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { X } from "lucide-react";
 
@@ -12,40 +12,90 @@ type Project = {
 };
 
 const GalleryCard = ({ project, onClick }: { project: Project; onClick: () => void }) => {
+  const ref = useRef<HTMLDivElement>(null);
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+  const rotateX = useSpring(useTransform(mouseY, [-0.5, 0.5], [10, -10]), { stiffness: 180, damping: 20 });
+  const rotateY = useSpring(useTransform(mouseX, [-0.5, 0.5], [-10, 10]), { stiffness: 180, damping: 20 });
+  const glareX = useSpring(useTransform(mouseX, [-0.5, 0.5], [0, 100]), { stiffness: 180, damping: 20 });
+  const glareY = useSpring(useTransform(mouseY, [-0.5, 0.5], [0, 100]), { stiffness: 180, damping: 20 });
+
+  const handleMouse = (e: React.MouseEvent) => {
+    if (!ref.current) return;
+    const rect = ref.current.getBoundingClientRect();
+    mouseX.set((e.clientX - rect.left) / rect.width - 0.5);
+    mouseY.set((e.clientY - rect.top) / rect.height - 0.5);
+  };
+
+  const handleLeave = () => {
+    mouseX.set(0);
+    mouseY.set(0);
+  };
+
   return (
     <motion.div
+      ref={ref}
+      onMouseMove={handleMouse}
+      onMouseLeave={handleLeave}
       onClick={onClick}
-      className="break-inside-avoid mb-5 group cursor-pointer rounded-xl overflow-hidden glass"
-      whileHover={{ y: -4 }}
-      transition={{ duration: 0.3 }}
+      style={{ rotateX, rotateY, transformPerspective: 900 }}
+      className="break-inside-avoid mb-5 group cursor-pointer"
     >
-      {project.image_url && (
-        <img
-          src={project.image_url}
-          alt={project.title}
-          className="w-full h-auto block transition-transform duration-700 group-hover:scale-105"
-          loading="lazy"
-        />
-      )}
-      <motion.div
-        className="absolute inset-0 bg-background/80 backdrop-blur-sm flex flex-col items-center justify-center p-6 text-center"
-        initial={false}
-        whileHover={{ opacity: 1 }}
-        animate={{ opacity: 0 }}
-        transition={{ duration: 0.35 }}
-      >
-        <span className="text-xs tracking-[0.2em] uppercase text-accent mb-3">
-          {project.category}
-        </span>
-        <h3 className="text-xl font-display font-semibold">
-          {project.title}
-        </h3>
-        {project.description && (
-          <p className="text-sm text-muted-foreground mt-2 max-w-xs">
-            {project.description}
-          </p>
+      <div className="relative rounded-xl overflow-hidden glass">
+        {project.image_url && (
+          <img
+            src={project.image_url}
+            alt={project.title}
+            className="w-full h-auto block transition-transform duration-700 group-hover:scale-110"
+            loading="lazy"
+          />
         )}
-      </motion.div>
+        {/* Glare effect */}
+        <motion.div
+          className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+          style={{
+            background: useTransform(
+              [glareX, glareY],
+              ([x, y]) => `radial-gradient(circle at ${x}% ${y}%, rgba(255,255,255,0.15) 0%, transparent 60%)`
+            ),
+          }}
+        />
+        {/* Hover overlay */}
+        <motion.div
+          className="absolute inset-0 bg-background/80 backdrop-blur-sm flex flex-col items-center justify-center p-6 text-center"
+          initial={false}
+          whileHover={{ opacity: 1 }}
+          animate={{ opacity: 0 }}
+          transition={{ duration: 0.4, ease: "easeOut" }}
+        >
+          <motion.span
+            className="text-xs tracking-[0.2em] uppercase text-accent mb-3"
+            initial={{ y: 12, opacity: 0 }}
+            whileHover={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.05, duration: 0.3 }}
+          >
+            {project.category}
+          </motion.span>
+          <motion.h3
+            className="text-xl font-display font-semibold"
+            initial={{ y: 12, opacity: 0 }}
+            whileHover={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.1, duration: 0.3 }}
+          >
+            {project.title}
+          </motion.h3>
+          {project.description && (
+            <motion.p
+              className="text-sm text-muted-foreground mt-2 max-w-xs"
+              initial={{ y: 12, opacity: 0 }}
+              whileHover={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.15, duration: 0.3 }}
+            >
+              {project.description}
+            </motion.p>
+          )}
+        </motion.div>
+      </div>
     </motion.div>
   );
 };
