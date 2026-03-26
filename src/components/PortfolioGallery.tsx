@@ -13,6 +13,7 @@ type Project = {
 
 const GalleryCard = ({ project, onClick }: { project: Project; onClick: () => void }) => {
   const ref = useRef<HTMLDivElement>(null);
+  const [hovered, setHovered] = useState(false);
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
   const rotateX = useSpring(useTransform(mouseY, [-0.5, 0.5], [10, -10]), { stiffness: 180, damping: 20 });
@@ -27,7 +28,9 @@ const GalleryCard = ({ project, onClick }: { project: Project; onClick: () => vo
     mouseY.set((e.clientY - rect.top) / rect.height - 0.5);
   };
 
+  const handleEnter = () => setHovered(true);
   const handleLeave = () => {
+    setHovered(false);
     mouseX.set(0);
     mouseY.set(0);
   };
@@ -36,6 +39,7 @@ const GalleryCard = ({ project, onClick }: { project: Project; onClick: () => vo
     <motion.div
       ref={ref}
       onMouseMove={handleMouse}
+      onMouseEnter={handleEnter}
       onMouseLeave={handleLeave}
       onClick={onClick}
       style={{ rotateX, rotateY, transformPerspective: 900 }}
@@ -43,16 +47,20 @@ const GalleryCard = ({ project, onClick }: { project: Project; onClick: () => vo
     >
       <div className="relative rounded-xl overflow-hidden glass">
         {project.image_url && (
-          <img
+          <motion.img
             src={project.image_url}
             alt={project.title}
-            className="w-full h-auto block transition-transform duration-700 group-hover:scale-110"
+            className="w-full h-auto block"
+            animate={{ scale: hovered ? 1.08 : 1 }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
             loading="lazy"
           />
         )}
-        {/* Glare effect */}
+        {/* Glare */}
         <motion.div
-          className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+          className="absolute inset-0 pointer-events-none"
+          animate={{ opacity: hovered ? 1 : 0 }}
+          transition={{ duration: 0.4 }}
           style={{
             background: useTransform(
               [glareX, glareY],
@@ -60,36 +68,35 @@ const GalleryCard = ({ project, onClick }: { project: Project; onClick: () => vo
             ),
           }}
         />
-        {/* Hover overlay */}
+        {/* Overlay */}
         <motion.div
-          className="absolute inset-0 bg-background/80 backdrop-blur-sm flex flex-col items-center justify-center p-6 text-center"
-          initial={false}
-          whileHover={{ opacity: 1 }}
-          animate={{ opacity: 0 }}
+          className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center"
+          animate={{
+            opacity: hovered ? 1 : 0,
+            backdropFilter: hovered ? "blur(8px)" : "blur(0px)",
+            backgroundColor: hovered ? "rgba(0,18,71,0.75)" : "rgba(0,18,71,0)",
+          }}
           transition={{ duration: 0.4, ease: "easeOut" }}
         >
           <motion.span
             className="text-xs tracking-[0.2em] uppercase text-accent mb-3"
-            initial={{ y: 12, opacity: 0 }}
-            whileHover={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.05, duration: 0.3 }}
+            animate={{ y: hovered ? 0 : 14, opacity: hovered ? 1 : 0 }}
+            transition={{ duration: 0.35, delay: hovered ? 0.05 : 0 }}
           >
             {project.category}
           </motion.span>
           <motion.h3
-            className="text-xl font-display font-semibold"
-            initial={{ y: 12, opacity: 0 }}
-            whileHover={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.1, duration: 0.3 }}
+            className="text-xl font-display font-semibold text-foreground"
+            animate={{ y: hovered ? 0 : 14, opacity: hovered ? 1 : 0 }}
+            transition={{ duration: 0.35, delay: hovered ? 0.12 : 0 }}
           >
             {project.title}
           </motion.h3>
           {project.description && (
             <motion.p
               className="text-sm text-muted-foreground mt-2 max-w-xs"
-              initial={{ y: 12, opacity: 0 }}
-              whileHover={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.15, duration: 0.3 }}
+              animate={{ y: hovered ? 0 : 14, opacity: hovered ? 1 : 0 }}
+              transition={{ duration: 0.35, delay: hovered ? 0.18 : 0 }}
             >
               {project.description}
             </motion.p>
